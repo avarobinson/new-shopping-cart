@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, makeStyles, Box, Drawer, Button } from '@material-ui/core';
+import { Grid, makeStyles, Box, Drawer, Button, Typography } from '@material-ui/core';
 import ProductCard from './components/ProductCard';
+import ShoppingCart from './components/ShoppingCart';
+// import Typography from '@material-ui/core/Typography';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,6 +23,8 @@ const App = () => {
   const product_ids = Object.keys(data);
   const products = Object.values(data);
   const [visibleCart, setVisibleCart] = useState(false)
+  const [cartItems, setCartItems] = useState([])  
+  const [cartTotal, setCartTotal] = useState(0)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,8 +37,6 @@ const App = () => {
 
   const [spacing, setSpacing] = useState(2);
   const classes = useStyles();
-
-  console.log(product_ids)
 
   const toggleDrawer = (open) => (event) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -48,16 +51,19 @@ const App = () => {
     <Grid container justify="center" spacing={spacing}>
       {products.map((product, idx) =>
         <Grid key={product.sku} item>
-          <ProductCard product={product} product_id={product_ids[idx]}/>
+          <ProductCard product={product} product_id={product_ids[idx]} cartState={ {cartItems, setCartItems}} visibleCartState = {{visibleCart, setVisibleCart}} cartTotalState = {{cartTotal, setCartTotal}}/>
         </Grid>
       )}
     </Grid>
     <Drawer anchor='right' open={visibleCart} onClose={toggleDrawer(false)}>
-      {products.map((product, idx) =>
+      {cartItems.map((product) =>
           <Grid key={product.sku} item>
-            <ProductCard product={product} product_id={product_ids[idx]}/>
+            <ShoppingCart products={products} product={product} cartState={{cartItems, setCartItems}}/>
           </Grid>
         )}
+      <Typography>
+        Cart total: $ {cartTotal}
+      </Typography>
     </Drawer>
     </div>
   );
