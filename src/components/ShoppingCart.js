@@ -19,7 +19,22 @@ const useStyles = makeStyles({
   },
 });
 
-const ShoppingCart = ({products, product, cartState}) =>{
+const handleRemove = ({cartState, cartTotalState}, product, size) => {
+    let currentCartItems = cartState.cartItems
+    console.log(currentCartItems)
+    currentCartItems = currentCartItems.filter(p => {
+        return(
+        !(p.sku === product.sku && p.size === size)
+        )
+    })
+    console.log(currentCartItems)
+    cartState.setCartItems(currentCartItems)
+    let updatedPrice = cartTotalState.cartTotal
+    updatedPrice = updatedPrice - product.price
+    cartTotalState.setCartTotal(updatedPrice)
+  };
+
+const ShoppingCart = ({products, product, cartState, cartTotalState}) =>{
     const classes = useStyles();
     const img_src = "data/products/" + product.sku + "_1.jpg"
 
@@ -44,7 +59,9 @@ const ShoppingCart = ({products, product, cartState}) =>{
             </Typography>
         </CardContent>
         <CardActions>
-        <Button size="small" color="primary">
+        <Button size="small" color="primary"
+        onClick = { () => handleRemove({cartState, cartTotalState}, product_info, product.size)}
+        >
             Remove
           </Button>
       </CardActions>

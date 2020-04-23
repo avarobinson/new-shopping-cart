@@ -20,8 +20,6 @@ const useStyles = makeStyles({
 });
 
 const handleCart = ({cartState, visibleCartState, cartTotalState, product}, size) => {
-  console.log(cartState)
-  console.log(cartState.cartItems)
   let currentCartItems = cartState.cartItems
   currentCartItems.push({sku: product.sku, size: size})
   cartState.setCartItems(currentCartItems)

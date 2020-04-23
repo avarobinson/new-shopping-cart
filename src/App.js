@@ -58,7 +58,7 @@ const App = () => {
     <Drawer anchor='right' open={visibleCart} onClose={toggleDrawer(false)}>
       {cartItems.map((product) =>
           <Grid key={product.sku} item>
-            <ShoppingCart products={products} product={product} cartState={{cartItems, setCartItems}}/>
+            <ShoppingCart products={products} product={product} cartState={{cartItems, setCartItems}} cartTotalState = {{cartTotal, setCartTotal}}/>
           </Grid>
         )}
       <Typography>
