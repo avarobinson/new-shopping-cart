@@ -25,6 +25,8 @@ const App = () => {
   const [visibleCart, setVisibleCart] = useState(false)
   const [cartItems, setCartItems] = useState([])  
   const [cartTotal, setCartTotal] = useState(0)
+  const [inventory, setInventory] = useState({});
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -34,6 +36,18 @@ const App = () => {
     };
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const fetchInventory = async () => {
+      const response = await fetch('./data/inventory.json');
+      const json = await response.json();
+      console.log(json)
+      setInventory(json);
+    };
+    fetchInventory();
+  }, []);
+
+  console.log(inventory)
 
   const [spacing, setSpacing] = useState(2);
   const classes = useStyles();
@@ -45,20 +59,23 @@ const App = () => {
     setVisibleCart(open);
   };
 
+  console.log(inventory)
+  console.log(inventory[0])
+
   return (
     <div>
     <Button onClick={toggleDrawer(true)}>CART</Button>
     <Grid container justify="center" spacing={spacing}>
       {products.map((product, idx) =>
         <Grid key={product.sku} item>
-          <ProductCard product={product} product_id={product_ids[idx]} cartState={ {cartItems, setCartItems}} visibleCartState = {{visibleCart, setVisibleCart}} cartTotalState = {{cartTotal, setCartTotal}}/>
+          <ProductCard product={product} product_id={product_ids[idx]} cartState={ {cartItems, setCartItems}} visibleCartState = {{visibleCart, setVisibleCart}} cartTotalState = {{cartTotal, setCartTotal}}  inventoryState = {{inventory, setInventory}}/>
         </Grid>
       )}
     </Grid>
     <Drawer anchor='right' open={visibleCart} onClose={toggleDrawer(false)}>
       {cartItems.map((product) =>
           <Grid key={product.sku} item>
-            <ShoppingCart products={products} product={product} cartState={{cartItems, setCartItems}} cartTotalState = {{cartTotal, setCartTotal}}/>
+            <ShoppingCart products={products} product={product} cartState={{cartItems, setCartItems}} cartTotalState = {{cartTotal, setCartTotal}} inventoryState = {{inventory, setInventory}}/>
           </Grid>
         )}
       <Typography>

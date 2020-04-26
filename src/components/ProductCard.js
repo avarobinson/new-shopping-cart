@@ -19,7 +19,7 @@ const useStyles = makeStyles({
   },
 });
 
-const handleCart = ({cartState, visibleCartState, cartTotalState, product}, size) => {
+const handleCart = ({cartState, visibleCartState, cartTotalState, product, inventoryState, product_id}, size) => {
   let currentCartItems = cartState.cartItems
   currentCartItems.push({sku: product.sku, size: size})
   cartState.setCartItems(currentCartItems)
@@ -27,11 +27,41 @@ const handleCart = ({cartState, visibleCartState, cartTotalState, product}, size
   let updatedPrice = cartTotalState.cartTotal
   updatedPrice = updatedPrice + product.price
   cartTotalState.setCartTotal(updatedPrice)
+
+  let newInv = inventoryState.inventory;
+  newInv[product_id][size] = newInv[product_id][size] - 1;
+  inventoryState.setInventory(newInv)
 };
 
-const ProductCard = ({product, product_id, cartState, visibleCartState, cartTotalState}) =>{
+const ProductCard = ({product, product_id, cartState, visibleCartState, cartTotalState, inventoryState}) =>{
     const classes = useStyles();
     const img_src = "data/products/" + product_id + "_1.jpg"
+    let inventoryOfProduct = inventoryState.inventory[product_id]
+
+    const checkInventory = (size) => {
+      if (inventoryOfProduct){
+        if (inventoryOfProduct[size] === 0){
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+      else{
+        return true;
+      }
+    };
+
+    const buttonMessage = (size) => {
+      let disabled = checkInventory(size)
+      if(disabled) {
+        return size + ' OUT OF STOCK';
+      }
+      else{
+        return size;
+      }
+    };
+
 
     return (
     <Card className={classes.root}>
@@ -52,23 +82,28 @@ const ProductCard = ({product, product_id, cartState, visibleCartState, cartTota
         </CardContent>
         <CardActions>
           <Button size="small" color="primary"
-            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product}, 'S')}
+            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product, inventoryState, product_id}, 'S')}
+            disabled = {checkInventory('S')}
           >
-            S
+            {buttonMessage('S')}
           </Button>
           <Button size="small" color="primary"
-            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product}, 'M')}
-          >
-            M
+            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product, inventoryState, product_id}, 'M')}
+            disabled = {checkInventory('M')}
+        >
+            {buttonMessage('M')}
           </Button>
           <Button size="small" color="primary"
-            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product}, 'L')}>
-            L
+            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product, inventoryState, product_id}, 'L')}
+            disabled = {checkInventory('L')}
+            >
+            {buttonMessage('L')}
           </Button>
           <Button size="small" color="primary"
-            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product}, 'M')}
+            onClick = { () => handleCart({cartState, visibleCartState, cartTotalState, product, inventoryState, product_id}, 'M')}
+            disabled = {checkInventory('XL')}
           >
-            XL
+            {buttonMessage('XL')}
           </Button>
       </CardActions>
         </CardActionArea>
