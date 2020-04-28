@@ -2,8 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { Grid, makeStyles, Box, Drawer, Button, Typography } from '@material-ui/core';
 import ProductCard from './components/ProductCard';
 import ShoppingCart from './components/ShoppingCart';
-// import Typography from '@material-ui/core/Typography';
+import firebase from 'firebase/app';
+import 'firebase/database';
 
+const firebaseConfig = {
+  apiKey: "AIzaSyATMi1DINGTMvJBO6TXWyrjBjaneBOwveM",
+  authDomain: "shopping-cart-7eefc.firebaseapp.com",
+  databaseURL: "https://shopping-cart-7eefc.firebaseio.com",
+  projectId: "shopping-cart-7eefc",
+  storageBucket: "shopping-cart-7eefc.appspot.com",
+  messagingSenderId: "1075129302064",
+  appId: "1:1075129302064:web:0a749def94dd57508e01f5",
+  measurementId: "G-701PL9G45W"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref();
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,7 +41,6 @@ const App = () => {
   const [cartTotal, setCartTotal] = useState(0)
   const [inventory, setInventory] = useState({});
 
-
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
@@ -37,14 +50,22 @@ const App = () => {
     fetchProducts();
   }, []);
 
+  // useEffect(() => {
+  //   const fetchInventory = async () => {
+  //     const response = await fetch('./data/inventory.json');
+  //     const json = await response.json();
+  //     console.log(json)
+  //     setInventory(json);
+  //   };
+  //   fetchInventory();
+  // }, []);
+
   useEffect(() => {
-    const fetchInventory = async () => {
-      const response = await fetch('./data/inventory.json');
-      const json = await response.json();
-      console.log(json)
-      setInventory(json);
-    };
-    fetchInventory();
+    const handleData = snap => {
+      if (snap.val()) setInventory(snap.val());
+    }
+    db.on('value', handleData, error => alert(error));
+    return () => { db.off('value', handleData); };
   }, []);
 
   console.log(inventory)
