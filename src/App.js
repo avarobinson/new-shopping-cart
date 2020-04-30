@@ -4,6 +4,11 @@ import ProductCard from './components/ProductCard';
 import ShoppingCart from './components/ShoppingCart';
 import firebase from 'firebase/app';
 import 'firebase/database';
+import 'firebase/auth';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import { Message } from "rbx";
+import "rbx/index.css";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyATMi1DINGTMvJBO6TXWyrjBjaneBOwveM",
@@ -18,6 +23,16 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database().ref();
+
+const uiConfig = {
+  signInFlow: 'popup',
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID
+  ],
+  callbacks: {
+    signInSuccessWithAuthResult: () => false
+  }
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,6 +55,11 @@ const App = () => {
   const [cartItems, setCartItems] = useState([])  
   const [cartTotal, setCartTotal] = useState(0)
   const [inventory, setInventory] = useState({});
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged(setUser);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -80,11 +100,37 @@ const App = () => {
     setVisibleCart(open);
   };
 
+  const Banner = ({ user, title }) => (
+    <React.Fragment>
+      { user ? <Welcome user={ user } /> : <SignIn /> }
+      <h3>{ title || '[loading...]' }</h3>
+    </React.Fragment>
+  );
+
+  const Welcome = ({ user }) => (
+    <Message color="info">
+      <Message.Header>
+        Welcome, {user.displayName}
+        <Button primary onClick={() => firebase.auth().signOut()}>
+          Log out
+        </Button>
+      </Message.Header>
+    </Message>
+  );
+
+  const SignIn = () => (
+    <StyledFirebaseAuth
+      uiConfig={uiConfig}
+      firebaseAuth={firebase.auth()}
+    />
+  );
+
   console.log(inventory)
   console.log(inventory[0])
 
   return (
     <div>
+    <Banner title="Ava's Store" user={ user } />
     <Button onClick={toggleDrawer(true)}>CART</Button>
     <Grid container justify="center" spacing={spacing}>
       {products.map((product, idx) =>
