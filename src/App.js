@@ -128,11 +128,10 @@ const App = () => {
   console.log(inventory)
   console.log(inventory[0])
 
-  const checkout = ({ user }) => {
+  const checkout = () => {
     // update the inventory to remove what is being checked out from cart
-    return (
-      console.log('checking out')
-    )
+    setCartItems([])
+    setCartTotal(0)
   };
 
   return (
@@ -155,7 +154,7 @@ const App = () => {
       <Typography>
         Cart total: $ {cartTotal.toFixed(2)}
       </Typography>
-      <Button onClick={checkout({user})}>CHECKOUT</Button>
+      <Button onClick={checkout}>CHECKOUT</Button>
     </Drawer>
     </div>
   );
