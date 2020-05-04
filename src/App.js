@@ -128,6 +128,13 @@ const App = () => {
   console.log(inventory)
   console.log(inventory[0])
 
+  const checkout = ({ user }) => {
+    // update the inventory to remove what is being checked out from cart
+    return (
+      console.log('checking out')
+    )
+  };
+
   return (
     <div>
     <Banner title="Ava's Store" user={ user } />
@@ -135,19 +142,20 @@ const App = () => {
     <Grid container justify="center" spacing={spacing}>
       {products.map((product, idx) =>
         <Grid key={product.sku} item>
-          <ProductCard product={product} product_id={product_ids[idx]} cartState={ {cartItems, setCartItems}} visibleCartState = {{visibleCart, setVisibleCart}} cartTotalState = {{cartTotal, setCartTotal}}  inventoryState = {{inventory, setInventory}}/>
+          <ProductCard product={product} product_id={product_ids[idx]} cartState={ {cartItems, setCartItems}} visibleCartState = {{visibleCart, setVisibleCart}} cartTotalState = {{cartTotal, setCartTotal}}  inventoryState = {{inventory, setInventory}} userState = {{user, setUser}}/>
         </Grid>
       )}
     </Grid>
     <Drawer anchor='right' open={visibleCart} onClose={toggleDrawer(false)}>
       {cartItems.map((product) =>
           <Grid key={product.sku} item>
-            <ShoppingCart products={products} product={product} cartState={{cartItems, setCartItems}} cartTotalState = {{cartTotal, setCartTotal}} inventoryState = {{inventory, setInventory}}/>
+            <ShoppingCart products={products} product={product} cartState={{cartItems, setCartItems}} cartTotalState = {{cartTotal, setCartTotal}} inventoryState = {{inventory, setInventory}} userState = {{user, setUser}}/>
           </Grid>
         )}
       <Typography>
-        Cart total: $ {cartTotal}
+        Cart total: $ {cartTotal.toFixed(2)}
       </Typography>
+      <Button onClick={checkout({user})}>CHECKOUT</Button>
     </Drawer>
     </div>
   );

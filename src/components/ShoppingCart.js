@@ -7,6 +7,9 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import firebase from 'firebase/app';
+import 'firebase/database';
+import 'firebase/auth';
 
 const useStyles = makeStyles({
   root: {
@@ -19,7 +22,7 @@ const useStyles = makeStyles({
   },
 });
 
-const handleRemove = ({cartState, cartTotalState, inventoryState}, product, size) => {
+const handleRemove = ({cartState, cartTotalState, inventoryState, userState}, product, size) => {
     let currentCartItems = cartState.cartItems
     console.log(currentCartItems)
     currentCartItems = currentCartItems.filter(p => {
@@ -36,9 +39,19 @@ const handleRemove = ({cartState, cartTotalState, inventoryState}, product, size
     let newInv = inventoryState.inventory;
     newInv[product.sku][size] = newInv[product.sku][size] + 1;
     inventoryState.setInventory(newInv)
+
+    const userUID = userState.user.uid;
+    console.log("length of cart state")
+    console.log(cartState.cartItems.length)
+    if(cartState.cartItems.length == 1){
+      firebase.database().ref("carts/" + userUID).remove();
+    }
+    else{
+      firebase.database().ref("carts/" + userUID).set(cartState.cartItems);
+    }
   };
 
-const ShoppingCart = ({products, product, cartState, cartTotalState, inventoryState}) =>{
+const ShoppingCart = ({products, product, cartState, cartTotalState, inventoryState, userState}) =>{
     const classes = useStyles();
     const img_src = "data/products/" + product.sku + "_1.jpg"
 
@@ -64,7 +77,7 @@ const ShoppingCart = ({products, product, cartState, cartTotalState, inventorySt
         </CardContent>
         <CardActions>
         <Button size="small" color="primary"
-        onClick = { () => handleRemove({cartState, cartTotalState, inventoryState}, product_info, product.size)}
+        onClick = { () => handleRemove({cartState, cartTotalState, inventoryState, userState}, product_info, product.size)}
         >
             Remove
           </Button>
